@@ -1365,13 +1365,13 @@ class ExportMenu extends GridView
                     $column->renderDataCell($model, $key, $index)) :
                     call_user_func($column->content, $model, $key, $index, $column);
             }
-            if (empty($value) && !empty($column->attribute) && $column->attribute !== null) {
+            if (empty($value) && $value != 0 && !empty($column->attribute) && $column->attribute !== null) {
                 $value = ArrayHelper::getValue($model, $column->attribute, '');
             }
             $this->_endCol++;
             $cell = $this->_objPHPExcelSheet->setCellValue(
                 self::columnName($this->_endCol) . ($index + $this->_beginRow + 1),
-                empty($value) ? '' : strip_tags($value),
+                (empty($value) && $value != 0) ? '' : strip_tags($value),
                 true
             );
             $this->raiseEvent('onRenderDataCell', [$cell, $value, $model, $key, $index, $this]);
@@ -1392,7 +1392,7 @@ class ExportMenu extends GridView
         $this->_endCol = 0;
         foreach ($this->getVisibleColumns() as $n => $column) {
             $this->_endCol = $this->_endCol + 1;
-            if ($column->footer) {
+            if (isset($column->footer) && (!empty($column->footer) || $column->footer == 0)) {
                 $footer = trim($column->footer) !== '' ? $column->footer : $column->grid->blankDisplay;
                 $cell = $this->_objPHPExcel->getActiveSheet()->setCellValue(
                     self::columnName($this->_endCol) . ($row + 2),
